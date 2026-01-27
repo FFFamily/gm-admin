@@ -1,6 +1,6 @@
-# 后台用户体系：技术栈清单（已确认：MySQL 8 / MyBatis-Plus / Sa-Token / 手工执行 SQL）
+# 后台用户体系：技术栈清单（最小必需）
 
-> 本文只罗列“为实现 doc/user-system-feature-list.md 所需的最小技术栈/组件选型”。
+> 约束已确认：MySQL 8 / MyBatis-Plus / Sa-Token / 手工执行 SQL；不使用 Redis；使用固定默认密码做本地验证。
 
 ## 1. 语言与基础框架
 
@@ -15,9 +15,7 @@
   - token 签发/校验、登录态、权限校验
   - 权限校验方式：注解（如 `@SaCheckPermission`）或代码（如 `StpUtil.checkPermission`）
   - token 存储：使用默认内存实现（不接入 Redis）
-- 密码哈希：BCrypt
-  - 候选 A：Spring Security Crypto（只引 `spring-security-crypto`，不引整套 Security）
-  - 候选 B：jBCrypt（不推荐，Spring 生态更统一）
+- 密码哈希：BCrypt（使用 `spring-security-crypto`）
 
 ## 3. 数据访问与数据库
 
@@ -25,21 +23,10 @@
 - JDBC：MySQL 驱动（`com.mysql:mysql-connector-j`）+ Spring Boot 默认连接池 HikariCP
 - DAO：MyBatis-Plus（`com.baomidou:mybatis-plus-spring-boot3-starter`）
 - SQL 执行方式：手工执行（不引入 Flyway/Liquibase）
-
-## 4. 接口层与工程化
+ 
+## 4. 参数校验
 
 - 参数校验：`spring-boot-starter-validation`（Jakarta Validation）
-- DTO 映射（可选，但开发更快）：
-  - 候选 A：MapStruct
-  - 候选 B：手写转换
-- API 文档（可选，但便于联调）：springdoc-openapi
-- 日志：Spring Boot 默认 Logback
-
-## 5. 测试
-
-- 单元/集成测试：`spring-boot-starter-test`（已在父 POM 中）
-- 集成测试数据库（建议）：
-  - Testcontainers（MySQL）
 
 ## 6. SQL 目录分类方案（对应功能清单第 8 节）
 
@@ -50,7 +37,7 @@
 - `sql/90_rollback/`：回滚脚本（如需要）
 - 命名建议：`V{yyyyMMddHHmm}__{desc}.sql`（便于排序与回放）
 
-## 7. 已确认的选型
+## 7. 已确认的选型（汇总）
 
 - MySQL 8
 - MyBatis-Plus

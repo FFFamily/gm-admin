@@ -3,6 +3,7 @@ package com.rcszh.gm.user.service.auth;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.rcszh.gm.common.exception.UnauthorizedException;
+import com.rcszh.gm.common.security.LoginIdUtils;
 import com.rcszh.gm.common.web.RequestUtils;
 import com.rcszh.gm.user.dto.auth.CurrentUserDto;
 import com.rcszh.gm.user.dto.auth.LoginRequest;
@@ -60,7 +61,7 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-        StpUtil.login(user.getId());
+        StpUtil.login(LoginIdUtils.adminLoginId(user.getId()));
         user.setLastLoginAt(LocalDateTime.now());
         userMapper.updateById(user);
         writeLoginLog(username, true, null);
@@ -69,7 +70,10 @@ public class AuthService {
     }
 
     public CurrentUserDto currentUser() {
-        Long userId = StpUtil.getLoginIdAsLong();
+        Long userId = LoginIdUtils.parseAdminId(StpUtil.getLoginId());
+        if (userId == null) {
+            throw new UnauthorizedException("Not logged in");
+        }
         SysUser u = userMapper.selectById(userId);
         if (u == null || Boolean.FALSE.equals(u.getEnabled())) {
             // Token exists but user is missing/disabled: treat as unauthorized.

@@ -25,7 +25,9 @@
         <module>gm-common</module>
         <module>gm-config</module>
         <module>gm-user</module>
+        <module>gm-file</module>
         <module>gm-api</module>
+        <module>gm-ow</module>
     </modules>
     <scm>
         <connection/>

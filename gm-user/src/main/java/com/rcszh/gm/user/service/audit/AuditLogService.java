@@ -3,6 +3,7 @@ package com.rcszh.gm.user.service.audit;
 import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rcszh.gm.common.security.LoginIdUtils;
 import com.rcszh.gm.common.web.RequestUtils;
 import com.rcszh.gm.user.entity.SysAuditLog;
 import com.rcszh.gm.user.mapper.SysAuditLogMapper;
@@ -29,7 +30,7 @@ public class AuditLogService {
 
     private void write(String action, String targetType, String targetId, Object detail, String result) {
         var log = new SysAuditLog();
-        log.setActorUserId(StpUtil.isLogin() ? StpUtil.getLoginIdAsLong() : null);
+        log.setActorUserId(StpUtil.isLogin() ? LoginIdUtils.parseAdminId(StpUtil.getLoginId()) : null);
         log.setAction(action);
         log.setTargetType(targetType);
         log.setTargetId(targetId);
@@ -52,4 +53,3 @@ public class AuditLogService {
         }
     }
 }
-

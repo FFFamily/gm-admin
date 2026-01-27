@@ -10,10 +10,19 @@ public record CurrentUserDto(
         String displayName,
         Boolean enabled,
         List<String> roleCodes,
-        List<String> permCodes
+        List<String> permCodes,
+        Boolean isAdmin
 ) {
     public static CurrentUserDto from(SysUser u, List<String> roleCodes, List<String> permCodes) {
-        return new CurrentUserDto(u.getId(), u.getUsername(), u.getDisplayName(), u.getEnabled(), roleCodes, permCodes);
+        boolean admin = roleCodes != null && roleCodes.stream().anyMatch("ADMIN"::equalsIgnoreCase);
+        return new CurrentUserDto(
+                u.getId(),
+                u.getUsername(),
+                u.getDisplayName(),
+                u.getEnabled(),
+                roleCodes,
+                permCodes,
+                admin
+        );
     }
 }
-

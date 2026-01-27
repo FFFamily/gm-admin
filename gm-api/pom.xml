@@ -25,6 +25,16 @@
         </dependency>
         <dependency>
             <groupId>com.rcszh</groupId>
+            <artifactId>gm-file</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rcszh</groupId>
+            <artifactId>gm-ow</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rcszh</groupId>
             <artifactId>gm-common</artifactId>
             <version>${project.version}</version>
         </dependency>

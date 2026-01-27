@@ -2,6 +2,7 @@ package com.rcszh.gm.config.security;
 
 import cn.dev33.satoken.stp.StpInterface;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.rcszh.gm.common.security.LoginIdUtils;
 import com.rcszh.gm.user.entity.SysPermission;
 import com.rcszh.gm.user.mapper.SysPermissionMapper;
 import com.rcszh.gm.user.mapper.SysUserRoleMapper;
@@ -23,7 +24,7 @@ public class StpInterfaceImpl implements StpInterface {
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        Long userId = toLong(loginId);
+        Long userId = LoginIdUtils.parseAdminId(loginId);
         if (userId == null) {
             return Collections.emptyList();
         }
@@ -41,28 +42,10 @@ public class StpInterfaceImpl implements StpInterface {
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        Long userId = toLong(loginId);
+        Long userId = LoginIdUtils.parseAdminId(loginId);
         if (userId == null) {
             return Collections.emptyList();
         }
         return userRoleMapper.selectRoleCodesByUserId(userId);
     }
-
-    private static Long toLong(Object loginId) {
-        if (loginId == null) {
-            return null;
-        }
-        if (loginId instanceof Long l) {
-            return l;
-        }
-        if (loginId instanceof Number n) {
-            return n.longValue();
-        }
-        try {
-            return Long.parseLong(loginId.toString());
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }
-
