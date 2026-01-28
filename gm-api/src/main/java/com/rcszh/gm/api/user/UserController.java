@@ -51,7 +51,8 @@ public class UserController {
 
     @SaCheckPermission("user:reset_password")
     @PostMapping("/{id}/reset-password")
-    public ApiResponse<UserResetPasswordResponse> resetPassword(@PathVariable("id") long id) {
-        return ApiResponse.ok(userService.resetPassword(id));
+    public ApiResponse<Void> resetPassword(@PathVariable("id") long id, @Valid @RequestBody UserResetPasswordRequest req) {
+        userService.resetPassword(id, req);
+        return ApiResponse.ok(null);
     }
 }

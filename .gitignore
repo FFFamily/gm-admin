@@ -37,3 +37,6 @@ build/
 
 ### Codex local workspace ###
 .codex/
+
+### Vite env local overrides ###
+web/gm-web-ui/.env*.local

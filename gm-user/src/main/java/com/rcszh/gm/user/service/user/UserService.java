@@ -6,7 +6,7 @@ import com.rcszh.gm.common.model.PageResult;
 import com.rcszh.gm.user.dto.user.UserCreateRequest;
 import com.rcszh.gm.user.dto.user.UserDetailDto;
 import com.rcszh.gm.user.dto.user.UserDto;
-import com.rcszh.gm.user.dto.user.UserResetPasswordResponse;
+import com.rcszh.gm.user.dto.user.UserResetPasswordRequest;
 import com.rcszh.gm.user.dto.user.UserUpdateRequest;
 import com.rcszh.gm.user.entity.SysRole;
 import com.rcszh.gm.user.entity.SysUser;
@@ -19,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
 import java.util.List;
 
 @Service
@@ -30,8 +29,6 @@ public class UserService {
     private final SysUserRoleMapper userRoleMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
-
-    private final SecureRandom random = new SecureRandom();
 
     public UserService(SysUserMapper userMapper,
                        SysRoleMapper roleMapper,
@@ -109,18 +106,16 @@ public class UserService {
     }
 
     @Transactional
-    public UserResetPasswordResponse resetPassword(long id) {
+    public void resetPassword(long id, UserResetPasswordRequest req) {
         SysUser u = userMapper.selectById(id);
         if (u == null) {
             throw new IllegalArgumentException("User not found");
         }
 
-        String tempPassword = randomPassword(12);
-        u.setPasswordHash(passwordEncoder.encode(tempPassword));
+        u.setPasswordHash(passwordEncoder.encode(req.newPassword()));
         userMapper.updateById(u);
 
         auditLogService.success("USER_RESET_PASSWORD", "USER", String.valueOf(u.getId()), null);
-        return new UserResetPasswordResponse(tempPassword);
     }
 
     private void replaceUserRoles(Long userId, List<String> roleCodes) {
@@ -143,13 +138,4 @@ public class UserService {
         }
     }
 
-    private String randomPassword(int len) {
-        final String alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
-        var sb = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            sb.append(alphabet.charAt(random.nextInt(alphabet.length())));
-        }
-        return sb.toString();
-    }
 }
-

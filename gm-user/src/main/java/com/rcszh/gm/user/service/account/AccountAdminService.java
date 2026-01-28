@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rcszh.gm.common.model.PageResult;
 import com.rcszh.gm.user.dto.account.admin.AdminAccountDetailDto;
 import com.rcszh.gm.user.dto.account.admin.AdminAccountDto;
-import com.rcszh.gm.user.dto.account.admin.AdminAccountResetPasswordResponse;
+import com.rcszh.gm.user.dto.account.admin.AdminAccountResetPasswordRequest;
 import com.rcszh.gm.user.dto.account.admin.AdminAccountUpdateRequest;
 import com.rcszh.gm.user.entity.AppAccount;
 import com.rcszh.gm.user.mapper.AppAccountMapper;
@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,8 +23,6 @@ public class AccountAdminService {
     private final AppAccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
-
-    private final SecureRandom random = new SecureRandom();
 
     public AccountAdminService(AppAccountMapper accountMapper, PasswordEncoder passwordEncoder, AuditLogService auditLogService) {
         this.accountMapper = accountMapper;
@@ -72,26 +69,14 @@ public class AccountAdminService {
     }
 
     @Transactional
-    public AdminAccountResetPasswordResponse resetPassword(long id) {
+    public void resetPassword(long id, AdminAccountResetPasswordRequest req) {
         AppAccount a = accountMapper.selectById(id);
         if (a == null) {
             throw new IllegalArgumentException("Account not found");
         }
-        String tempPassword = randomPassword(12);
-        a.setPasswordHash(passwordEncoder.encode(tempPassword));
+        a.setPasswordHash(passwordEncoder.encode(req.newPassword()));
         accountMapper.updateById(a);
 
         auditLogService.success("ACCOUNT_RESET_PASSWORD", "ACCOUNT", String.valueOf(id), null);
-        return new AdminAccountResetPasswordResponse(tempPassword);
-    }
-
-    private String randomPassword(int len) {
-        final String alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
-        var sb = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            sb.append(alphabet.charAt(random.nextInt(alphabet.length())));
-        }
-        return sb.toString();
     }
 }
-

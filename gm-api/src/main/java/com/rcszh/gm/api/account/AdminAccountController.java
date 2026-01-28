@@ -5,7 +5,7 @@ import com.rcszh.gm.common.api.ApiResponse;
 import com.rcszh.gm.common.model.PageResult;
 import com.rcszh.gm.user.dto.account.admin.AdminAccountDetailDto;
 import com.rcszh.gm.user.dto.account.admin.AdminAccountDto;
-import com.rcszh.gm.user.dto.account.admin.AdminAccountResetPasswordResponse;
+import com.rcszh.gm.user.dto.account.admin.AdminAccountResetPasswordRequest;
 import com.rcszh.gm.user.dto.account.admin.AdminAccountUpdateRequest;
 import com.rcszh.gm.user.service.account.AccountAdminService;
 import jakarta.validation.Valid;
@@ -48,8 +48,8 @@ public class AdminAccountController {
 
     @SaCheckPermission("account:reset_password")
     @PostMapping("/{id}/reset-password")
-    public ApiResponse<AdminAccountResetPasswordResponse> resetPassword(@PathVariable("id") long id) {
-        return ApiResponse.ok(accountAdminService.resetPassword(id));
+    public ApiResponse<Void> resetPassword(@PathVariable("id") long id, @Valid @RequestBody AdminAccountResetPasswordRequest req) {
+        accountAdminService.resetPassword(id, req);
+        return ApiResponse.ok(null);
     }
 }
-
